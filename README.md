@@ -14,7 +14,10 @@ See [`PLAN.md`](./PLAN.md) for the full project plan, architecture, and phased b
   correct color pipeline, render-on-demand loop, rig loading + canonical bone-name normalisation.
 - **Phase 2 (FK posing):** done — click a joint, drag to rotate (`TransformControls`), per-joint
   limits, undo/redo.
-- **Phase 3 (IK):** not started — see `src/pose/ik.js`.
+- **Phase 3 (IK):** done — `CCDIKSolver` chains (arm, leg) with a goal bone per limb appended to
+  the skeleton at setup, draggable via `TransformControls`, per-limb FK/IK toggle. Elbow/knee
+  hinges use the solver's native `limitation` axis constraint; all limits come from `rig/limits.js`
+  (one shared table for FK and IK).
 - **Phase 4 (pose management):** partial — versioned pose schema, save/load via IndexedDB. Mirror
   and import/export JSON are implemented as pure functions but not yet wired into the UI.
 - **Phase 5 (polish):** not started.

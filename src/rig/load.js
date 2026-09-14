@@ -6,6 +6,7 @@ import { buildNameTable } from './rigMap.js';
  * @property {import('three').Object3D} object   - the loaded scene graph, ready to add
  * @property {import('three').Object3D} root      - hips-equivalent root for position control
  * @property {import('three').Skeleton} skeleton
+ * @property {import('three').SkinnedMesh} mesh   - one representative skinned mesh, for CCDIKSolver
  * @property {Map<string, import('three').Bone>} bonesByName - canonical name -> Bone
  * @property {string[]} unmapped - vendor bone names that had no canonical mapping
  */
@@ -30,8 +31,13 @@ export async function loadRig(url) {
 export function buildRig(object) {
   /** @type {import('three').Skeleton | null} */
   let skeleton = null;
+  /** @type {import('three').SkinnedMesh | null} */
+  let mesh = null;
   object.traverse((node) => {
-    if (node.isSkinnedMesh && !skeleton) skeleton = node.skeleton;
+    if (node.isSkinnedMesh && !skeleton) {
+      skeleton = node.skeleton;
+      mesh = node;
+    }
     if (node.isMesh) {
       node.castShadow = true;
       node.receiveShadow = true;
@@ -59,5 +65,5 @@ export function buildRig(object) {
 
   const root = bonesByName.get('hips') ?? skeleton.bones[0];
 
-  return { object, root, skeleton, bonesByName, unmapped };
+  return { object, root, skeleton, mesh, bonesByName, unmapped };
 }

@@ -54,7 +54,9 @@ export function getLimit(canonicalName) {
   return LIMITS[baseNameOf(canonicalName)] ?? null;
 }
 
-const AXIS_VECTORS = { x: new Vector3(1, 0, 0), y: new Vector3(0, 1, 0), z: new Vector3(0, 0, 1) };
+// Shared with pose/ik.js so CCDIKSolver's `limitation` axis and this
+// module's hinge clamp always agree — one source of truth per joint.
+export const AXIS_VECTORS = { x: new Vector3(1, 0, 0), y: new Vector3(0, 1, 0), z: new Vector3(0, 0, 1) };
 
 function clampHinge(quaternion, limit) {
   const axis = AXIS_VECTORS[limit.axis];

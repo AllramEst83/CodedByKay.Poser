@@ -8,9 +8,10 @@ import { listPoses, loadPose, savePose } from '../storage/poseLibrary.js';
  * @param {ReturnType<typeof import('../app/commands.js').createCommandStack>} deps.commandStack
  * @param {import('three').Scene} deps.scene
  * @param {string} deps.modelId
+ * @param {ReturnType<typeof import('../pose/ik.js').createIkController>} [deps.ik]
  * @param {() => void} deps.invalidate
  */
-export function createGui({ state, commandStack, scene, modelId, invalidate }) {
+export function createGui({ state, commandStack, scene, modelId, ik, invalidate }) {
   const gui = new GUI({ title: 'Pose Tool' });
 
   const poseFolder = gui.addFolder('Pose');
@@ -49,6 +50,19 @@ export function createGui({ state, commandStack, scene, modelId, invalidate }) {
       });
   }
   refreshPoseList();
+
+  if (ik) {
+    const ikFolder = gui.addFolder('IK (drag the green goal)');
+    const ikState = Object.fromEntries(ik.chainNames.map((name) => [name, ik.isChainEnabled(name)]));
+    for (const name of ik.chainNames) {
+      ikFolder
+        .add(ikState, name)
+        .name(name)
+        .onChange((enabled) => {
+          ik.setChainEnabled(name, enabled);
+        });
+    }
+  }
 
   const lightingFolder = gui.addFolder('Lighting');
   const lightingState = { preset: 'studio' };

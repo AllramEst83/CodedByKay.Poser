@@ -24,6 +24,7 @@ import { clampQuaternion } from '../rig/limits.js';
  * @param {ReturnType<typeof import('../app/state.js').createState>} deps.state
  * @param {ReturnType<typeof import('../app/commands.js').createCommandStack>} deps.commandStack
  * @param {() => void} deps.invalidate
+ * @param {Set<string>} [deps.ikLockedBones] - canonical bone names an active IK chain owns; FK ignores clicks on these
  */
 export function createFkController({
   camera,
@@ -36,6 +37,7 @@ export function createFkController({
   state,
   commandStack,
   invalidate,
+  ikLockedBones = new Set(),
 }) {
   const transformControls = new TransformControls(camera, renderer.domElement);
   transformControls.setMode('rotate');
@@ -91,7 +93,9 @@ export function createFkController({
     raycaster.setFromCamera(pointer, camera);
     const hits = raycaster.intersectObjects(proxyMeshes, false);
     if (hits.length) {
-      select(hits[0].object.userData.canonicalBone);
+      const name = hits[0].object.userData.canonicalBone;
+      if (ikLockedBones.has(name)) return; // an active IK chain owns this joint
+      select(name);
     }
   }
 
